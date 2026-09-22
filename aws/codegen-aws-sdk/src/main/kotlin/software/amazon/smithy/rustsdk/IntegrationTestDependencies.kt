@@ -121,8 +121,13 @@ class IntegrationTestDependencies(
                         addDependency(Tracing.toDevDependency())
                         addDependency(TracingSubscriber)
                         addDependency(
+                            // `legacy-test-util` is needed by integration tests that call
+                            // `dvr::ReplayingClient::take_requests`, which returns
+                            // `http_02x::Request` and is therefore gated behind the pre-1.x test
+                            // utilities. This is a dev-dependency, so it does not put http 0.2.x
+                            // into a consumer's dependency tree.
                             smithyHttpClient(runtimeConfig).copy(
-                                features = setOf("test-util", "wire-mock"),
+                                features = setOf("test-util", "wire-mock", "legacy-test-util"),
                                 scope = DependencyScope.Dev,
                             ),
                         )
@@ -148,7 +153,7 @@ class IntegrationTestDependencies(
     private fun serviceSpecificCustomizations(): List<LibRsCustomization> =
         when (moduleName) {
             "bedrockruntime" -> listOf(BedrockRuntimeDependencies(runtimeConfig))
-            "dynamodb" -> listOf(DynamoDbTestDependencies())
+            "dynamodb" -> listOf(DynamoDbTestDependencies(runtimeConfig))
             "s3" -> listOf(S3TestDependencies(runtimeConfig))
             "transcribestreaming" -> listOf(TranscribeTestDependencies())
             "webassembly" -> listOf(WebAssemblyTestDependencies())
@@ -163,10 +168,15 @@ class BedrockRuntimeDependencies(private val runtimeConfig: RuntimeConfig) : Lib
         }
 }
 
-class DynamoDbTestDependencies : LibRsCustomization() {
+class DynamoDbTestDependencies(private val runtimeConfig: RuntimeConfig) : LibRsCustomization() {
     override fun section(section: LibRsSection): Writable =
         writable {
             addDependency(Approx)
+            addDependency(awsConfig(runtimeConfig).toDevDependency().withFeature("test-util"))
+            // Used by `tests/protocol-swap.rs` to plug `AwsRestXmlProtocol`
+            // into a JSON-RPC service to demonstrate runtime protocol selection
+            // (the Serialization-Schema-Decoupling SEP's goal 2).
+            addDependency(CargoDependency.smithyXml(runtimeConfig).toDevDependency())
         }
 }
 

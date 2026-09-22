@@ -14,6 +14,7 @@ use crate::docs_for;
 use crate::endpoint_config::AccountIdEndpointMode;
 use crate::origin::Origin;
 use crate::region::{Region, SigningRegionSet};
+use crate::sdk_ua_metadata::FrameworkMetadata;
 use crate::service_config::LoadServiceConfig;
 use aws_credential_types::provider::token::SharedTokenProvider;
 pub use aws_credential_types::provider::SharedCredentialsProvider;
@@ -64,6 +65,13 @@ This only needs to be required for creating deterministic tests or platforms whe
 **Only some services support request compression.** For services
 that don't support request compression, this setting does nothing.
 " };
+        (disable_clock_skew_correction) => {
+"When `true`, disable clock skew correction. Defaults to `false`.
+
+Clock skew correction adjusts the request signing timestamp to compensate for drift between
+the client and service clocks. When disabled, the SDK signs with the local clock and does not
+retry clock-skew errors.
+" };
         (request_min_compression_size_bytes) => {
 "The minimum size of request that should be compressed. Defaults to `10240` bytes.
 
@@ -108,6 +116,7 @@ signature is valid for. Use `*` for a universal signature valid in all regions.
 #[derive(Debug, Clone)]
 pub struct SdkConfig {
     app_name: Option<AppName>,
+    framework_metadata: Vec<FrameworkMetadata>,
     auth_scheme_preference: Option<AuthSchemePreference>,
     sigv4a_signing_region_set: Option<SigningRegionSet>,
     identity_cache: Option<SharedIdentityCache>,
@@ -128,6 +137,7 @@ pub struct SdkConfig {
     service_config: Option<Arc<dyn LoadServiceConfig>>,
     config_origins: HashMap<&'static str, Origin>,
     disable_request_compression: Option<bool>,
+    disable_clock_skew_correction: Option<bool>,
     request_min_compression_size_bytes: Option<u32>,
     request_checksum_calculation: Option<RequestChecksumCalculation>,
     response_checksum_validation: Option<ResponseChecksumValidation>,
@@ -142,6 +152,7 @@ pub struct SdkConfig {
 #[derive(Debug, Default)]
 pub struct Builder {
     app_name: Option<AppName>,
+    framework_metadata: Vec<FrameworkMetadata>,
     auth_scheme_preference: Option<AuthSchemePreference>,
     sigv4a_signing_region_set: Option<SigningRegionSet>,
     identity_cache: Option<SharedIdentityCache>,
@@ -162,6 +173,7 @@ pub struct Builder {
     service_config: Option<Arc<dyn LoadServiceConfig>>,
     config_origins: HashMap<&'static str, Origin>,
     disable_request_compression: Option<bool>,
+    disable_clock_skew_correction: Option<bool>,
     request_min_compression_size_bytes: Option<u32>,
     request_checksum_calculation: Option<RequestChecksumCalculation>,
     response_checksum_validation: Option<ResponseChecksumValidation>,
@@ -625,6 +637,32 @@ impl Builder {
         self
     }
 
+    /// Appends framework metadata to the user agent.
+    ///
+    /// This _optional_ metadata identifies a software framework or third-party library that is
+    /// being used with the SDK. It is rendered into the user agent (as `lib/{name}/{version}`) so
+    /// that libraries built on top of the AWS SDK can self-identify in the requests they make.
+    /// Each call appends another entry rather than replacing previous ones.
+    ///
+    /// Entries are de-duplicated on `(name, version)`, rendered in first-seen order, and the total
+    /// number of unique entries included in the user agent is capped (currently at 10); additional
+    /// entries beyond the cap are dropped with a warning.
+    pub fn framework_metadata(mut self, framework_metadata: FrameworkMetadata) -> Self {
+        self.framework_metadata.push(framework_metadata);
+        self
+    }
+
+    /// Sets the framework metadata for the user agent, replacing any previously set entries.
+    ///
+    /// See [`Builder::framework_metadata`] for details on framework metadata.
+    pub fn set_framework_metadata(
+        &mut self,
+        framework_metadata: impl IntoIterator<Item = FrameworkMetadata>,
+    ) -> &mut Self {
+        self.framework_metadata = framework_metadata.into_iter().collect();
+        self
+    }
+
     /// Sets the HTTP client to use when making requests.
     ///
     /// ## Examples
@@ -786,6 +824,21 @@ impl Builder {
         self
     }
 
+    #[doc = docs_for!(disable_clock_skew_correction)]
+    pub fn disable_clock_skew_correction(mut self, disable_clock_skew_correction: bool) -> Self {
+        self.set_disable_clock_skew_correction(Some(disable_clock_skew_correction));
+        self
+    }
+
+    #[doc = docs_for!(disable_clock_skew_correction)]
+    pub fn set_disable_clock_skew_correction(
+        &mut self,
+        disable_clock_skew_correction: Option<bool>,
+    ) -> &mut Self {
+        self.disable_clock_skew_correction = disable_clock_skew_correction;
+        self
+    }
+
     #[doc = docs_for!(request_min_compression_size_bytes)]
     pub fn request_min_compression_size_bytes(
         mut self,
@@ -887,6 +940,7 @@ impl Builder {
     pub fn build(self) -> SdkConfig {
         SdkConfig {
             app_name: self.app_name,
+            framework_metadata: self.framework_metadata,
             auth_scheme_preference: self.auth_scheme_preference,
             sigv4a_signing_region_set: self.sigv4a_signing_region_set,
             identity_cache: self.identity_cache,
@@ -907,6 +961,7 @@ impl Builder {
             service_config: self.service_config,
             config_origins: self.config_origins,
             disable_request_compression: self.disable_request_compression,
+            disable_clock_skew_correction: self.disable_clock_skew_correction,
             request_min_compression_size_bytes: self.request_min_compression_size_bytes,
             request_checksum_calculation: self.request_checksum_calculation,
             response_checksum_validation: self.response_checksum_validation,
@@ -1052,6 +1107,11 @@ impl SdkConfig {
         self.app_name.as_ref()
     }
 
+    /// Configured framework metadata
+    pub fn framework_metadata(&self) -> &[FrameworkMetadata] {
+        &self.framework_metadata
+    }
+
     /// Configured HTTP client
     pub fn http_client(&self) -> Option<SharedHttpClient> {
         self.http_client.clone()
@@ -1075,6 +1135,11 @@ impl SdkConfig {
     /// When true, request compression is disabled.
     pub fn disable_request_compression(&self) -> Option<bool> {
         self.disable_request_compression
+    }
+
+    /// When true, clock skew correction is disabled.
+    pub fn disable_clock_skew_correction(&self) -> Option<bool> {
+        self.disable_clock_skew_correction
     }
 
     /// Configured checksum request behavior.
@@ -1136,6 +1201,7 @@ impl SdkConfig {
     pub fn into_builder(self) -> Builder {
         Builder {
             app_name: self.app_name,
+            framework_metadata: self.framework_metadata,
             auth_scheme_preference: self.auth_scheme_preference,
             sigv4a_signing_region_set: self.sigv4a_signing_region_set,
             identity_cache: self.identity_cache,
@@ -1156,6 +1222,7 @@ impl SdkConfig {
             service_config: self.service_config,
             config_origins: self.config_origins,
             disable_request_compression: self.disable_request_compression,
+            disable_clock_skew_correction: self.disable_clock_skew_correction,
             request_min_compression_size_bytes: self.request_min_compression_size_bytes,
             request_checksum_calculation: self.request_checksum_calculation,
             response_checksum_validation: self.response_checksum_validation,

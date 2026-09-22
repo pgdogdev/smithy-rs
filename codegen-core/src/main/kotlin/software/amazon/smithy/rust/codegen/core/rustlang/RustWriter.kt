@@ -615,6 +615,7 @@ class RustWriter private constructor(
                         fileName.endsWith(".toml") -> RustWriter(fileName, namespace, "#", debugMode = debugMode)
                         fileName.endsWith(".py") -> RustWriter(fileName, namespace, "#", debugMode = debugMode)
                         fileName.endsWith(".md") -> rawWriter(fileName, debugMode = debugMode)
+                        fileName.endsWith(".json") -> rawWriter(fileName, debugMode = debugMode)
                         fileName == "LICENSE" -> rawWriter(fileName, debugMode = debugMode)
                         fileName.startsWith("tests/") ->
                             RustWriter(
@@ -623,8 +624,6 @@ class RustWriter private constructor(
                                 debugMode = debugMode,
                                 devDependenciesOnly = true,
                             )
-
-                        fileName == "package.json" -> rawWriter(fileName, debugMode = debugMode)
                         fileName == "stubgen.sh" -> rawWriter(fileName, debugMode = debugMode)
                         else -> RustWriter(fileName, namespace, debugMode = debugMode)
                     }
@@ -832,6 +831,16 @@ class RustWriter private constructor(
                             // for a boolean. Don't explicitly check against `true` to avoid a clippy lint.
                             is BooleanShape ->
                                 rustBlock("if !${variable.asValue()}") {
+                                    block(variable)
+                                }
+
+                            is FloatShape ->
+                                rustBlock("if ${variable.asValue()} != ${default}_f32") {
+                                    block(variable)
+                                }
+
+                            is DoubleShape ->
+                                rustBlock("if ${variable.asValue()} != ${default}_f64") {
                                     block(variable)
                                 }
 

@@ -6,146 +6,21 @@
   "smithy-rs": [],
   "aws-sdk-rust": [
     {
-      "message": "Fix null value handling in dense collections: SDK now correctly rejects null values in non-sparse collections instead of silently dropping them.\n",
+      "message": "Update the `lru` dependency to 0.18.2 to address RUSTSEC-2026-0253.",
       "meta": {
         "bug": true,
         "breaking": false,
         "tada": false
       },
-      "author": "vcjana",
-      "references": [],
-      "since-commit": "2d226ef3c59de83febdc6790e2bf2a44f43f1d1f",
+      "author": "shrey4796",
+      "references": [
+        "aws-sdk-rust#1451"
+      ],
+      "since-commit": "f1b64a9c0dd001d4bac4277fec4041da59c1f48d",
       "age": 5
     },
     {
-      "message": "Prevent memory leak in identity cache when overriding credentials via `config_override`. Each `config_override` that sets a credentials provider now uses an operation-scoped identity cache instead of the shared client-level cache, preventing unbounded partition growth. Additionally, the client-level identity cache now enforces a configurable `max_partitions` cap (default: 64) as a safety net.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "ysaito",
-      "references": [
-        "smithy-rs#4340"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Fix `TokenBucket::is_full()` and `TokenBucket::is_empty()` to convert fractional tokens into whole permits before checking availability. Previously, accumulated fractional tokens from success rewards were not accounted for, causing these methods to return incorrect results.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "annahay4",
-      "references": [
-        "smithy-rs#4596",
-        "aws-sdk-rust#1423"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Make `ProviderConfig::with_use_fips()` and `ProviderConfig::with_use_dual_stack()` public so that applications constructing a `ProviderConfig` directly can propagate FIPS and dual-stack settings to credential providers.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": true
-      },
-      "author": "hligit",
-      "references": [
-        "smithy-rs#4551"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Upgrade `sha2` from 0.10.x to 0.11.x. The previous version defaulted to software-based compression instead of hardware-accelerated compression, resulting in lower throughput. The new version automatically detects and uses hardware-accelerated instructions when available.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "ysaito1001",
-      "references": [
-        "smithy-rs#4587"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Optimize `Encoder::str()` and `Encoder::blob()` by collapsing multiple `write_all` calls into a single buffer operation. This bypasses minicbor's generic writer to write the CBOR type+length header and payload directly into the underlying `Vec<u8>`, improving performance on serialization-heavy hot paths.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "ysaito1001",
-      "references": [
-        "smithy-rs#4591"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Fix waiter codegen failure when JMESPath `&&` or `||` expressions have non-boolean operands (e.g., a list field used as a truthiness check). Non-boolean types are now coerced to booleans using JMESPath truthiness rules: arrays and strings check `!is_empty()`, all other non-null types are truthy.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "ysaito1001",
-      "references": [
-        "smithy-rs#4599"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Add `sigv4a_signing_region_set` client configuration. Supports programmatic, environment variable (`AWS_SIGV4A_SIGNING_REGION_SET`), and shared config file (`sigv4a_signing_region_set`) configuration. User-provided values now take priority over endpoint-resolved values.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": true
-      },
-      "author": "vcjana",
-      "references": [
-        "smithy-rs#4521"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Add missing `EventOrInitial`, `EventOrInitialMarshaller`, and `EventStreamSender::into_inner` to `aws-smithy-legacy-http` event_stream module, fixing compilation failures in generated SDKs that reference these types.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "jlizen",
-      "references": [
-        "smithy-rs#4431"
-      ],
-      "since-commit": "00c6d6096f0d618545a7dece903770d8acb21114",
-      "age": 4
-    },
-    {
-      "message": "Upgrade `p256` from 0.11 to 0.13.2 in `aws-sigv4` so the SigV4a signing path uses the same major version already pulled in elsewhere in the SDK and benefits from upstream maintenance fixes.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "suzak",
-      "references": [
-        "smithy-rs#4648"
-      ],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
-    },
-    {
-      "message": "Implement retry behavior 2.1, opt-in via `AWS_NEW_RETRIES_2026=true` environment variable. Non-throttling errors now use 50ms base backoff (previously 1,000ms). Transient retry quota cost is 14 tokens (previously 5). DynamoDB and DynamoDB Streams use a 25ms base backoff and increase default max attempts to 4 (from 3). Long-polling operations (SQS `ReceiveMessage`, SFN `GetActivityTask`, SWF `PollForActivityTask`/`PollForDecisionTask`) backoff even when the retry token bucket is empty.\n",
+      "message": "The SDK now corrects for clock skew automatically. Requests are signed with a timestamp, and\nif the clock on the machine running the SDK drifts from the service's clock, the service can\nreject the signature (commonly seen as `SignatureDoesNotMatch`, `InvalidSignatureException`,\nor `RequestTimeTooSkewed`). The SDK measures the offset between the two clocks from the\nresponse `Date` header, and when that offset exceeds 4 minutes it treats the failure as clock\nskew: it adjusts the timestamp it signs with, retries the request, and remembers the offset on\nthe client so later requests are signed correctly the first time. This is enabled by default\nand needs no code changes. Presigned requests are unaffected: a presigned URL is always signed\nat the `start_time` you give it, so it stays a function of its inputs.\n\nIf you need to turn it off, the correction can be disabled three ways (highest precedence first):\n\n- In code, on the config loader (or a service client's config builder):\n  ```rust\n  let sdk_config = aws_config::defaults(aws_config::BehaviorVersion::latest())\n      .disable_clock_skew_correction(true)\n      .load()\n      .await;\n  ```\n- Environment variable:\n  ```\n  AWS_DISABLE_CLOCK_SKEW_CORRECTION=true\n  ```\n- Shared config profile:\n  ```ini\n  [default]\n  disable_clock_skew_correction = true\n  ```\n",
       "meta": {
         "bug": false,
         "breaking": false,
@@ -153,124 +28,108 @@
       },
       "author": "ysaito1001",
       "references": [
-        "smithy-rs#4638"
+        "smithy-rs#4800",
+        "aws-sdk-rust#1033"
       ],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
+      "since-commit": "1b52f70da687c2f6e0644b88bb74aa63df91c946",
+      "age": 4
     },
     {
-      "message": "Remove the `ring` dependency from `aws-sigv4`. The `sigv4a` feature previously pulled in `ring` solely for HMAC-SHA256 in the SigV4a signing-key derivation; this is now done with the `hmac`/`sha2` (RustCrypto) crates that were already used by the SigV4 signer. `ring` is in maintenance hibernation, and the original reason for using it (a version conflict with the older `p256` crate at the time SigV4a was introduced) no longer applies. Users of the `sigv4a` feature will see `ring` removed from their dependency tree.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "suzak",
-      "references": [
-        "smithy-rs#4650"
-      ],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
-    },
-    {
-      "message": "Fix `ProfileFileCredentialsProvider` so that profile-level `use_fips_endpoint` and `use_dualstack_endpoint` settings are propagated to the internal STS client used during assume-role credential chaining. Previously these settings were only applied when the provider was built through `aws_config::ConfigLoader::load`, so users constructing `ProfileFileCredentialsProvider` directly via its builder would see STS requests go to non-FIPS / non-dual-stack endpoints even when the selected profile enabled them.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "lnj",
-      "references": [
-        "smithy-rs#4614"
-      ],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
-    },
-    {
-      "message": "Fix adaptive retry rate limiter to never allow negative token bucket capacity. Previously, `acquire_permission_to_send_a_request` unconditionally deducted the request cost even when returning a delay, causing capacity to go negative. With multiple concurrent tasks, this produced cascading sleep times proportional to the number of tasks (e.g., task 50 sleeping 100s), leading to near-zero request rates that never recovered after a throttling event. Now, capacity is only deducted when a token is actually granted, and the orchestrator re-acquires after sleeping to account for concurrent state changes.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "vcjana",
-      "references": [
-        "smithy-rs#4632"
-      ],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
-    },
-    {
-      "message": "Optimized BDD endpoint resolution performance by replacing HashMap-based auth schemes with a typed `EndpointAuthScheme` struct, inlining the BDD evaluation loop, and adding a single-entry endpoint cache. The BDD resolver is now up to 49% faster than the original implementation and outperforms the tree-based resolver on most benchmarks.\n",
-      "meta": {
-        "bug": false,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "lnj",
-      "references": [],
-      "since-commit": "c29cba1fa16dbda9697f523e86ca9bb5ec2f6d67",
-      "age": 3
-    },
-    {
-      "message": "Improve the `Debug` output of HTTP `Headers` and `Request` in `aws-smithy-runtime-api` to redact values of headers commonly used to carry sensitive data. The header name remains visible and the value is replaced with a placeholder that includes the original byte length to preserve diagnostic utility. The `aws-sigv4` signer applies the same redaction when logging the canonical request. The plain `Display` impl on `CanonicalRequest` is unchanged to preserve the raw canonical form used by downstream consumers.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "aajtodd",
-      "references": [],
-      "since-commit": "8f0882046c467981ba5b4fd91a10befa96bd262f",
-      "age": 2
-    },
-    {
-      "message": "Fix paginator codegen for operations whose `@paginated` `outputToken` targets a `@required` member. Previously, the generated `src/lens.rs` borrowing accessor emitted a direct field access (`input.field`) instead of a reference (`&input.field`) for required members, causing a type mismatch (`Option<&String>` vs `String`).\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "vcjana",
-      "references": [],
-      "since-commit": "8f0882046c467981ba5b4fd91a10befa96bd262f",
-      "age": 2
-    },
-    {
-      "message": "Fix `ConnectorBuilder::default()` to enable `TCP_NODELAY` by default. Previously, the auto-derived `Default` impl left `enable_tcp_nodelay` at `false`, while the curated `Connector::builder()` initialized it to `true`. The `Default` impl on `ConnectorBuilder` is now hand-written to match `Connector::builder()`, so all construction paths, including the SDK's `default_https_client`, get `enable_tcp_nodelay = true` consistently. Without `TCP_NODELAY`, Nagle's algorithm can hold small writes in the kernel waiting for ACKs; on request shapes emitted as multiple small sub-MSS writes, such as the tested HTTP/2 small-body SDK path where HEADERS and DATA are flushed separately, this can add roughly one RTT plus delayed-ACK time. Callers who relied on the previous unintended `enable_tcp_nodelay = false` default of `ConnectorBuilder::default()` can restore that behavior with `.enable_tcp_nodelay(false)`.\n",
-      "meta": {
-        "bug": true,
-        "breaking": false,
-        "tada": false
-      },
-      "author": "PeterUlb",
-      "references": [],
-      "since-commit": "8f0882046c467981ba5b4fd91a10befa96bd262f",
-      "age": 2
-    },
-    {
-      "message": "Implement `serde::Serializer` and `serde::Deserializer` traits for `aws_smithy_types::Document`, allowing it to be used as a self-describing data format. This enables converting any `Serialize` type into a `Document` via `to_document()` and deserializing a `Document` into any `Deserialize` type via `from_document()`.\n",
+      "message": "Add presigned request support for the S3 `ListObjectVersions` operation.\n",
       "meta": {
         "bug": false,
         "breaking": false,
         "tada": true
       },
-      "author": "dnorred",
-      "references": [],
-      "since-commit": "8f0882046c467981ba5b4fd91a10befa96bd262f",
-      "age": 2
+      "author": "alastair-phantom",
+      "references": [
+        "aws-sdk-rust#488"
+      ],
+      "since-commit": "1b52f70da687c2f6e0644b88bb74aa63df91c946",
+      "age": 4
     },
     {
-      "message": "Redact the `AWS_CONTAINER_AUTHORIZATION_TOKEN` value from WARN log output and error `Display` output when the ECS/EKS container credential provider rejects the token as invalid for use as an HTTP header. Previously, if the token contained a byte rejected by `HeaderValue` validation, it was logged at WARN level and embedded in the error string propagated through the credential chain. The value is now redacted.\n",
+      "message": "`aws_smithy_types::Blob` now implements `Display` and renders its contents as a lowercase hex-encoded string in both `Display` and `Debug` output. Previously, the derived `Debug` implementation delegated to the underlying byte buffer, producing noisy `[u8, u8, ...]`-style output in service logs. Hex encoding keeps the payload legible without requiring the `@sensitive` trait for non-sensitive binary fields.\n",
+      "meta": {
+        "bug": false,
+        "breaking": false,
+        "tada": true
+      },
+      "author": "amodam-user",
+      "references": [
+        "smithy-rs#4756"
+      ],
+      "since-commit": "1b52f70da687c2f6e0644b88bb74aa63df91c946",
+      "age": 4
+    },
+    {
+      "message": "Fix `cargo test` failing to build for generated clients that use certain inlineables. The `http_request_checksum`, `http_response_checksum`, `dsql_auth_token`, `rds_auth_token`, and `endpoint_discovery` inlineables each ship a `#[cfg(test)]` module that uses `#[tokio::test]`, but none of them declared tokio as a dev-dependency. Tokio was instead arriving incidentally, either from protocol test code generation or from the integration-test dependencies added for services that have a directory under `aws/sdk/integration-tests/`.\n",
       "meta": {
         "bug": true,
         "breaking": false,
         "tada": false
       },
-      "author": "aajtodd",
+      "author": "ysaito1001",
+      "references": [
+        "smithy-rs#4814"
+      ],
+      "since-commit": "1b52f70da687c2f6e0644b88bb74aa63df91c946",
+      "age": 4
+    },
+    {
+      "message": "Updated `aws_smithy_types::Document` to cover the full Smithy data model in line with recent updates to the Smithy \"Document Types and Type Registries\" specification. The enum gains four variants — `Blob(Vec<u8>)`, `Timestamp(DateTime)`, `BigInteger(BigInteger)`, and `BigDecimal(BigDecimal)` — and is now marked `#[non_exhaustive]` so future Smithy data-model extensions can ship as additive changes. Three companion types join the public API at `aws_smithy_types::*`: `DiscriminatedDocument` (wraps a `Document` with an optional shape-ID discriminator and protocol-aware codec settings, used by the type-registry deserialization flow); `DocumentSettings` (trait for format-specific coercion, e.g. base64-decoding JSON strings to blobs); and `DocumentError` (numeric-coercion overflow, type mismatch, and invalid-input errors emitted by the new numeric / blob / timestamp accessors).\n\nConstruction via the pre-existing variants (`Document::String(\"...\".into())`, `Document::Bool(true)`, `Document::Array(vec![])`, `Document::Null`) and every pre-existing `From<...>` impl (`bool`, `&str`, `String`, `Cow<'_, str>`, `u64`, `i64`, `i32`, `f64`, `Number`, `Vec<Document>`, `Option<T>`, and `HashMap<String, Document>`) continue to work unchanged. `Document::Object` is the exception: its inner type changed (see below), so `Document::Object(my_hash_map)` no longer compiles, though `Document::from(my_hash_map)` and `my_hash_map.into()` still do.\n\n**Migration recipe**\n\nExhaustive `match` statements on `Document` no longer compile. Because the enum is now `#[non_exhaustive]`, external code must include a wildcard arm even if every currently-known variant is named — this is what protects future variant additions from being a breaking change. Add a `_ =>` arm:\n\n```rust\nmatch doc {\n    Document::Null => /* ... */,\n    Document::Bool(b) => /* ... */,\n    Document::Number(n) => /* ... */,\n    Document::String(s) => /* ... */,\n    Document::Object(o) => /* ... */,\n    Document::Array(a) => /* ... */,\n    // Optionally handle the new variants explicitly:\n    Document::Blob(b) => /* base64-encode? */,\n    Document::Timestamp(ts) => /* format? */,\n    Document::BigInteger(bi) => /* string-encode? */,\n    Document::BigDecimal(bd) => /* string-encode? */,\n    // Required by #[non_exhaustive]:\n    _ => /* fallback for future variants */,\n}\n```\n\n`Document::Object` map entries are now iterated in insertion order.\n\n**`Document::Object` inner type change**\n\n`Document::Object` now wraps an insertion-ordered `aws_smithy_types::document::DocumentObject` instead of a `std::collections::HashMap<String, Document>`. This is source-breaking beyond the variant additions in three ways:\n\n- Naming the old inner type no longer compiles. A pattern bind or annotation that referred to `HashMap<String, Document>` (for example `Document::Object(map) => { let _: &HashMap<String, Document> = map; }`) must be updated to `DocumentObject`.\n- Passing a `HashMap` to the variant constructor no longer compiles. A variant position performs no implicit conversion, so `Document::Object(my_hash_map)` must become `Document::Object(DocumentObject::from(my_hash_map))` — or, more simply, `Document::from(my_hash_map)`, since `From<HashMap<String, Document>> for Document` is retained.\n- `HashMap`-only methods are unavailable. `DocumentObject` mirrors most of the `HashMap` surface (`insert`, `get`, `get_mut`, `contains_key`, `remove`, `len`, `is_empty`, `clear`, `iter` / `iter_mut`, `keys`, `values` / `values_mut`, indexing by `&str` / `&String`, and the `IntoIterator` / `FromIterator` / `Extend` impls), but methods such as `.entry()`, `.retain()`, `.drain()`, `.capacity()`, `.reserve()`, and `.get_key_value()` are not provided.\n\nMigration:\n\n```rust\nuse aws_smithy_types::document::DocumentObject;\nuse std::collections::HashMap;\n\n// Build a DocumentObject from a HashMap...\nlet obj = DocumentObject::from(map);\n// ...or from scratch (`DocumentObject::with_capacity` is also available):\nlet mut obj = DocumentObject::new();\nobj.insert(\"key\".to_string(), Document::String(\"value\".to_string()));\n\n// Construct the variant from a HashMap:\nlet doc = Document::Object(DocumentObject::from(map));\n// ...or use the retained `From` impl on `Document`:\nlet doc = Document::from(map);\n\n// Recover a HashMap when one is specifically required:\nlet map: HashMap<String, Document> = obj.into_iter().collect();\n```\n",
+      "meta": {
+        "bug": false,
+        "breaking": true,
+        "tada": true
+      },
+      "author": "landonxjames",
       "references": [],
-      "since-commit": "8f0882046c467981ba5b4fd91a10befa96bd262f",
+      "since-commit": "e25edf45eed0aebc62be46801a0e099f734e0a12",
+      "age": 3
+    },
+    {
+      "message": "`aws-sdk-ssm` now uses schema-based serialization and deserialization instead of\nthe legacy per-shape `protocol_serde` code. SSM is the first AWS service on the\nschema serde path as part of its phased rollout; no change in behavior is\nexpected. Other `awsJson1_1` services are unaffected.\n",
+      "meta": {
+        "bug": false,
+        "breaking": false,
+        "tada": true
+      },
+      "author": "landonxjames",
+      "references": [],
+      "since-commit": "e25edf45eed0aebc62be46801a0e099f734e0a12",
+      "age": 3
+    },
+    {
+      "message": "Reverted the expanded `aws_smithy_types::Document` data model and the accompanying type/error registries, restoring the `Document` API as it was in `aws-smithy-types` 1.6.3.\n\nThe expanded `Document` was a source-breaking change shipped as a minor version bump (`aws-smithy-types` 1.6.3 -> 1.7.0). Every published `aws-smithy-json` before 0.64.0 declares an open-ended `aws-smithy-types = \"^1.x\"` requirement while matching exhaustively on `Document` and constructing `Document::Object(HashMap)`, so those crates stopped compiling as soon as cargo resolved `aws-smithy-types` to 1.7.0. Because `aws-config` 1.12.0 still required `aws-smithy-json ^0.63.0`, a clean `cargo add aws-config` resolved both json 0.63.0 and 0.64.0 against a single unified `aws-smithy-types` 1.7.0 and failed to build. The 1.1.7 runtime release has been yanked in full.\n\n**What this restores**\n\n- `Document` returns to six variants (`Object`, `Array`, `Number`, `String`, `Bool`, `Null`) and is no longer `#[non_exhaustive]`, so exhaustive `match` statements compile again without a wildcard arm.\n- `Document::Object` holds a `HashMap<String, Document>` again. `DocumentObject` is removed, along with its insertion-order iteration guarantee; object iteration order is unspecified once more.\n- The companion public types `DiscriminatedDocument`, `DocumentSettings`, and `DocumentError` are removed, as are the `as_blob` / `as_timestamp` / `as_big_integer` / `as_big_decimal` accessors and the `Result`-returning numeric accessors.\n- `aws_smithy_schema`'s `ShapeId` and `Schema` drop their lifetime parameter, returning to `ShapeId` / `Schema` with `ShapeId::from_static(...)`.\n- The `TypeRegistry` and error-registry machinery is removed, including the generated package-level `registry()` and `error_registry()` accessors and the registry-backed fallback for unmodeled error codes. Error dispatch returns to the generated `match error_code { ... }` over each operation's modeled errors.\n- Schema-based serde is no longer enabled for the SSM client.\n\n**Migration**\n\nCode written against 1.6.3 needs no changes. Code that adopted the 1.7.0 `Document` should revert to the 1.6.3 shape: drop wildcard `match` arms added solely for `#[non_exhaustive]`, replace `DocumentObject` annotations with `HashMap<String, Document>`, and stop relying on insertion-ordered object iteration. Since 1.7.0 is yanked, cargo will resolve `^1` to the restored API automatically.\n",
+      "meta": {
+        "bug": true,
+        "breaking": true,
+        "tada": false
+      },
+      "author": "landonxjames",
+      "references": [
+        "smithy-rs#4721",
+        "smithy-rs#4837"
+      ],
+      "since-commit": "47d4899c3630792b47f076d718310efe6e767ca4",
       "age": 2
+    },
+    {
+      "message": "Across the Smithy runtime crates and generated SDK crates, `http` 0.2.x is now reached only through a named feature. Every crate below still supports it; nothing is removed.\n\n**A default build is unchanged.** Generated SDK crates still enable the `rustls` feature by default, which builds the legacy `hyper` 0.14 / `rustls` 0.21 HTTP client and brings `http` 0.2.x with it. No crate is added to or removed from a default dependency tree by this change. Making the default client opt-in is a separate, later change.\n\nWhat this change makes possible is *removing* `http` 0.2.x, which addresses the unpatched `http` 0.2.x advisories for builds that opt out. See \"Removing `http` 0.2.x from your dependency tree\" below.\n\n### Recommended setup\n\nMost users need no feature configuration and are unaffected:\n\n```toml\naws-sdk-s3 = \"...\"\n```\n\nEnable `http-02x` (on the SDK crate, or on the individual runtime crate) only if you need the `http` 0.2.x interop APIs:\n\n```toml\naws-sdk-s3 = { version = \"...\", features = [\"http-02x\"] }\n```\n\n### Removing `http` 0.2.x from your dependency tree\n\nIf you need `http` 0.2.x gone entirely — for example to satisfy a patch-compliance scan, since `http` 0.2.x has unpatched advisories — disable default features and re-enable the ones you need, omitting `rustls` (and not enabling `legacy-https-client`, which selects the same legacy stack):\n\n```toml\naws-sdk-s3 = { version = \"...\", default-features = false, features = [\n    \"sigv4a\", \"http-1x\", \"default-https-client\", \"rt-tokio\"\n] }\n```\n\nThat is `aws-sdk-s3`'s default feature list with `rustls` left out; the list varies slightly per SDK crate, so check the crate you depend on. The result has no `http` 0.2.x, `http-body` 0.4.x, `hyper` 0.14, `rustls` 0.21 or `h2` 0.3 in **either normal or dev scope**. `aws-config` needs no configuration — it already depends on the SDK crates it uses with `default-features = false` and defaults to `default-https-client`.\n\nCargo features are additive, so this is the only way to get a smaller tree: there is no feature that removes `http` 0.2.x, only features that add it.\n\n### `aws-smithy-runtime-api`\n\n`http` 0.2.x is now optional behind the pre-existing `http-02x` feature (off by default). The crate's internal HTTP representations (`Headers`, `Uri`, `HttpError`, `EndpointPrefix`, and request/response extensions) now use the `http` 1.x types.\n\n**Breaking change:** these previously unconditional `pub` conversions now require the `http-02x` feature:\n\n- `Request::try_into_http02x` and `Response::try_into_http02x`\n- `impl From<http_02x::Uri> for Uri`\n- `impl TryInto<http_02x::Request<B>> for Request<B>` and `impl TryFrom<http_02x::Request<B>> for Request<B>`\n- `impl TryFrom<http_02x::Response<B>> for Response<B>`\n- `impl From<http_02x::StatusCode> for StatusCode` and `impl From<StatusCode> for http_02x::StatusCode`\n- `impl TryFrom<http_02x::HeaderMap> for Headers`\n- `impl AsHeaderComponent for http_02x::HeaderName` and `impl AsHeaderComponent for http_02x::HeaderValue`\n\nAdditionally, `Request::try_into_http02x` now returns an `Err` instead of panicking when the request URI is valid under `http` 1.x but not under `http` 0.2.x, and `TryFrom<http_02x::HeaderMap> for Headers` now returns an `Err` instead of panicking for header names that `http` 0.2.x accepts but `http` 1.x rejects.\n\n### `aws-smithy-types`\n\nNeither the `http-body-1-x` feature nor the `rt-tokio` feature pulls in `http` 0.2.x or `http-body` 0.4.x anymore. `rt-tokio` now uses the `http-body` 1.x path for file-based bodies, and the legacy adapter code (the `Http1toHttp04` body adapter, the 0.2.x header conversions, and the 0.4.x file-body impl) is gated behind the `http-body-0-4-x` feature.\n\n**Breaking change:** because `rt-tokio` no longer implies `http-body-0-4-x`, the `http` 0.2.x / `http-body` 0.4.x interop APIs are not available with only `rt-tokio` enabled. If you use `SdkBody::from_body_0_4`, `ByteStream::from_body_0_4`, or the `From<hyper_0_14::Body>` impls, enable `http-body-0-4-x`.\n\n### `aws-smithy-runtime`\n\n`http` 0.2.x and `http-body` 0.4.x are now optional behind a new `http-02x` feature (off by default), and the crate no longer forces on `aws-smithy-types`' `http-body-0-4-x` feature.\n\n**Breaking change:** these `pub` modules now require the `http-02x` feature:\n\n- `client::endpoint`, which contains the already-deprecated `apply_endpoint`. Its 1.8.0 deprecation notice already announced that it may be feature gated in a future minor version.\n- `client::http::body::minimum_throughput::http_body_0_4_x`, which provides the `http_body::Body` 0.4.x implementations for `MinimumThroughputDownloadBody` and `ThroughputReadingBody`. Stalled stream protection is unaffected on the `http` 1.x path, which is what generated clients use.\n\n**Breaking change:** the `test-util` feature no longer enables `legacy-test-util`, so it no longer pulls the `hyper` 0.14 stack — `hyper` 0.14 and `http-body` 0.4.x — into the dependency tree. Note that `http` 0.2.x itself is still reachable under `test-util`, through `aws-smithy-protocol-test`, which has not been moved off it. Two re-exports moved behind `legacy-test-util`, since both are the pre-1.x variants:\n\n- `client::http::test_util::capture_request`\n- `client::http::test_util::infallible_client_fn`\n\nKeep them by enabling `legacy-test-util`, or migrate to the `http` 1.x equivalents in `aws_smithy_http_client::test_util`. `ReplayEvent`, `StaticReplayClient`, `NeverClient` and `capture_test_logs` are unaffected — they are already `http` 1.x or version-agnostic.\n\nThe legacy `connector-hyper-0-14-x` and `legacy-test-util` features otherwise work unchanged: they already pulled in the `http` 0.2.x ecosystem transitively through `aws-smithy-http-client`, and now declare what they need explicitly.\n\n**Bug fix:** `aws-smithy-runtime` now falls back to the `hyper` 1.x client when a `BehaviorVersion` older than `v2026_01_12` would otherwise get no default HTTP client at all. That path previously consulted only `connector-hyper-0-14-x`, so two configurations installed no client and failed every request with \"No HTTP client was available to send this request\": a build without the legacy connector, and a build with the connector but no TLS implementation, since the legacy `default_client` requires `legacy-rustls-ring`. Builds that do have a working legacy client are unaffected and continue to use it for those behavior versions.\n\nThis matters for the opt-out above. Leaving `rustls` out of the feature list removes the legacy connector, so without this fallback a client pinned to a `BehaviorVersion` older than `v2026_01_12` would come up with no HTTP client. Falling back is not silent: it logs a warning naming the feature to enable if you need the legacy stack.\n\n**Advance notice of a coming default change.** A build that resolves to the legacy `hyper` 0.14.x client now logs a warning once per process saying that the default becomes the `hyper` 1.x client in the 2.x release, currently expected November 2026 — a different TLS implementation, with different connection-pooling and timeout behavior. Nothing changes yet; this release only tells you where you stand.\n\nIt fires only where the legacy client is actually selected: a `BehaviorVersion` older than `v2026_01_12` with the legacy stack compiled in, which is what a default build is today. Clients on `v2026_01_12` or later already use the `hyper` 1.x client and are unaffected, so they stay quiet.\n\nTo keep the legacy client through that change, add `legacy-https-client` now — that spelling is stable across it, whereas `rustls` becomes a synonym for the `hyper` 1.x client:\n\n```toml\naws-sdk-s3 = { version = \"...\", features = [\"legacy-https-client\"] }\n```\n\nNote the warning cannot tell a caller who has already pinned `legacy-https-client` apart from one riding the default, because both arrive at `aws-smithy-runtime` as `tls-rustls`. If you have already pinned it, you are set and can ignore the warning.\n\n### `aws-sigv4`\n\nThe default-on `sign-http` feature no longer declares a dependency on `http` 0.2.x. Nothing compiled under that feature used it: request signing runs on `http` 1.x through `SigningInstructions::apply_to_request_http1x`, and the only `http` 0.2.x path, `apply_to_request_http0x`, is gated on `http0-compat`. `http` 0.2.x is now reachable only through `http0-compat`.\n\nNo public API changed. However, `aws-runtime` used to enable `aws-sigv4/http0-compat`, so applications depending on both crates were getting that feature switched on for them through Cargo feature unification. If you call `apply_to_request_http0x`, enable `aws-sigv4/http0-compat` explicitly.\n\n### Generated SDK crates\n\nThe `http` dependency is now optional, enabled by a new opt-in `http-02x` feature. Generated crates also no longer enable `http-02x` on `aws-smithy-runtime-api` or `aws-runtime` unless that feature is turned on.\n\n**Breaking change:** the deprecated `http` 0.2.x conversions on `PresignedRequest` require the `http-02x` feature:\n\n- `PresignedRequest::make_http_02x_request`\n- `PresignedRequest::into_http_02x_request`\n\nPrefer migrating to the `http` 1.x equivalents, which are enabled by default and are not deprecated: `PresignedRequest::make_http_1x_request` and `PresignedRequest::into_http_1x_request`.\n\nA new opt-in **`legacy-https-client`** feature names the `hyper` 0.14.x + `rustls` 0.21.x HTTP client — the same stack the default-on `rustls` feature selects today. It is additive: `rustls` is what puts that stack in a default build, so adding this feature changes no dependency tree.\n\nIt exists now because `rustls` is going to change meaning. A later release will make `rustls` a synonym for `default-https-client` (the `hyper` 1.x stack) and drop it from the default list, at which point a call site that wrote `features = [\"rustls\"]` meaning \"the legacy stack\" will silently get a different one. Spelling it `legacy-https-client` instead pins the stack you actually want, and that spelling will keep working:\n\n```toml\naws-sdk-s3 = { version = \"...\", features = [\"legacy-https-client\"] }\n```\n\nThe generated test features changed too, so that building with `test-util` no longer drags `http` 0.2.x in:\n\n- `test-util` no longer enables `aws-smithy-runtime`'s test features, so it no longer adds `http` 0.2.x on top of whatever the build already has. A build with `--features test-util` now resolves to the same HTTP stack as a build without it.\n- A new opt-in **`legacy-test-util`** feature provides the pre-1.x test helpers for anyone who still needs them, and pulls `http` 0.2.x back in when enabled. It also enables `test-util`, so `--features legacy-test-util` on its own is enough to compile and run tests.\n\n### `aws-runtime`\n\n`aws-runtime`'s `http-02x` feature now enables `aws-smithy-types/http-body-0-4-x` itself. It previously inherited that feature transitively from `aws-smithy-runtime`, so enabling `aws-runtime/http-02x` on its own did not compile.\n",
+      "meta": {
+        "bug": true,
+        "breaking": true,
+        "tada": false
+      },
+      "author": "yychen23",
+      "references": [
+        "smithy-rs#4805",
+        "smithy-rs#4810",
+        "smithy-rs#4827"
+      ],
+      "since-commit": "00339dffe307687434407943f7a3740ff812288e",
+      "age": 1
     }
   ],
   "aws-sdk-model": []
